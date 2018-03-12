@@ -1,0 +1,36 @@
+on cluster in home directory e.g./home/nx902220/ (1st time install):
+
+setup python environment:
+module load python/canopy-1.7.2 
+canopy_cli venv ~/canopy-env -s 
+module switch python/canopy-1.7.2-myenv 
+
+Install JSAnimation:
+/usr/bin/git clone https://github.com/jakevdp/JSAnimation.git 
+
+setup notebook & matplotlib:
+cd JSAnimation/ 
+python setup.py install --user 
+pip install notebook
+pip install matplotlib
+
+then can setup notebook environment: (http://wiki.sse.reading.ac.uk/wiki/IPython)
+jupyter notebook --port 8989 & #it is possible that someone will already be connected to that host. If this is the case you'll get an error message. Try something like http://localhost:8988 instead.
+
+(first time connection may require copy & paste of url from shell into firefox)
+
+then in firefox go to:
+http://localhost:8989
+
+and NEW -> Python 2 opens python browser
+
+import JSAnimation
+
+
+____________
+
+when re-connecting:
+module load python/canopy-1.7.2-myenv
+
+cd JSAnimation
+jupyter notebook --port 8989 &
