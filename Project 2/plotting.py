@@ -10,7 +10,7 @@ def plot_TaskB(u_on_vsouth, v_on_uwest, n_on_nmiddle, n_on_n):
     y_array.insert(0,0)
     y_array.append(pm.pm['L'])
 
-    plt.subplot(1, 2, 1)
+    plt.subplot(1,2,1)
     plt.title("(a)")
     plt.plot(x_array,u_on_vsouth)
     plt.plot(y_array, v_on_uwest)
@@ -21,11 +21,21 @@ def plot_TaskB(u_on_vsouth, v_on_uwest, n_on_nmiddle, n_on_n):
     plt.plot(x_array, n_on_nmiddle)
     plt.tight_layout()
 
-    plt.subplot(1, 2, 2)
+    plt.subplot(1,2,2)
     plt.title("(b)")
     plt.contourf(n_on_n)
     plt.colorbar()
 
-def plot_TaskC(E_num):
     t_array = range(pm.pm['nt'])
     plt.plot(t_array, E_num)
+
+def plot_TaskD(n_on_n_ana, n_diff_on_n):
+    plt.subplot(1,2,1)
+    plt.title("a")
+    plt.contourf(n_on_n_ana)
+    plt.colorbar()
+
+    plt.subplot(1,2,2)
+    plt.title("b")
+    plt.contourf(n_diff_on_n)
+    plt.colorbar()

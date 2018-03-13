@@ -8,7 +8,7 @@ import plotting as pt
 
 #if task a = true do this, if task b = true do this etc. main(TaskA=True,TaskB=True...)
 #initialise arrays with initial conditions
-def main(TaskB = False, TaskC = False):
+def main(TaskB = False, TaskC = False, TaskD = False):
     u_on_u, v_on_v, n_on_n, u_on_n, v_on_n, v_on_u, u_on_v = bc.ic()
 
     E_num = []
@@ -45,22 +45,22 @@ def main(TaskB = False, TaskC = False):
     if TaskC == True:
         pt.plot_TaskC(E_num)
 
-# print u_on_u
-# print n_on_n
-# print v_on_v
-# print E_num
+    # print u_on_u
+    # print n_on_n
+    # print v_on_v
+    # print E_num
 
-#    n_on_n_ana, u_on_n_ana, v_on_n_ana = bc.ic()[2:5]
-#    sch.analytic_solution(n_on_n_ana, u_on_n_ana, v_on_n_ana, n_on_n[(pm.pm['nx']-1)/2,0])
-# print u_on_n_ana
-# print v_on_n_ana
-# print n_on_n_ana
+    n_on_n_ana, u_on_n_ana, v_on_n_ana = bc.ic()[2:5]
+    sch.analytic_solution(n_on_n_ana, u_on_n_ana, v_on_n_ana, n_on_n[(pm.pm['nx']-1)/2,0])
+    # print u_on_n_ana
+    # print v_on_n_ana
+    # print n_on_n_ana
 
-#    u_diff_on_n = np.subtract(u_on_n, u_on_n_ana)
-#    v_diff_on_n = np.subtract(v_on_n, v_on_n_ana)
-#    n_diff_on_n = np.subtract(n_on_n, n_on_n_ana)
+    u_diff_on_n = np.subtract(u_on_n, u_on_n_ana)
+    v_diff_on_n = np.subtract(v_on_n, v_on_n_ana)
+    n_diff_on_n = np.subtract(n_on_n, n_on_n_ana)
 
-#    pt.plot_contour_n(n_on_n_ana)
-#    pt.plot_contour_n(n_diff_on_n)
+    if TaskD == True:
+        pt.plot_TaskD(n_on_n_ana, n_diff_on_n)
 
-#    print sch.calc_E(n_diff_on_n, u_diff_on_n, v_diff_on_n)
+        print sch.calc_E(n_diff_on_n, u_diff_on_n, v_diff_on_n)
