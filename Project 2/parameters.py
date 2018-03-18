@@ -9,10 +9,10 @@ def calc_Rd(g, H, f0):
     return math.sqrt(g*H)/float(f0)
 
 def tau(tau0, y, L):
-    if y < 0:
-        y = 0
-    if y > L:
-        y = L
+    # if y < 0:
+    #     y = 0
+    # if y > L:
+    #     y = L
     tau = np.zeros(2)
     tau[0] = -tau0*math.cos(math.pi*y/float(L))
     return tau
@@ -32,10 +32,10 @@ pm['H'] = 1e3
 pm['tau0'] = 0.2
 
 #spatial values
-pm['nx'] = 51 #101 #26 #11
+pm['nx'] = 26 #41 #51
 pm['d'] = pm['L']/float(pm['nx']-1)
 
 
 #temporal values
-pm['dt'] = 140   #70      #280    #280
-pm['nt'] = 10#*30#618*60 #618*15  #618*15
+pm['dt'] = 150 #100 #100
+pm['nt'] = 576#*30 #864*30 #864*30

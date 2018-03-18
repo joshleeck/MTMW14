@@ -4,11 +4,11 @@ import math
 
 
 def du_dx_on_n(j,i,u_on_u):
-    du_dx = (u_on_u[j,i+1] - u_on_u[j,i])/float(pm.pm['d'])
+    du_dx = (u_on_u[j, i + 1] - u_on_u[j, i]) / float(pm.pm['d'])
     return du_dx
 
 def dv_dy_on_n(j,i,v_on_v):
-    dv_dy = (v_on_v[j+1,i] - v_on_v[j,i])/float(pm.pm['d'])
+    dv_dy = (v_on_v[j + 1, i] - v_on_v[j, i]) / float(pm.pm['d'])
     return dv_dy
 
 def dn_dx_on_u(j,i,n_on_n):
@@ -72,11 +72,11 @@ def u_on_v(j,i,u_on_u):
     return (a + b + c + d)/4.
 
 def u_on_n(j,i,u_on_u):
-    u_centred = (u_on_u[j,i+1] + u_on_u[j,i])/2.
+    u_centred = (u_on_u[j, i + 1] + u_on_u[j, i]) / 2.
     return u_centred
 
 def v_on_n(j,i,v_on_v):
-    v_centred = (v_on_v[j+1,i] + v_on_v[j,i])/2.
+    v_centred = (v_on_v[j + 1, i] + v_on_v[j, i]) / 2.
     return v_centred
 
 def f1(x):
@@ -101,12 +101,14 @@ def find_d_point_on_n(j,i,v_on_n_old,u_on_n_old,u_on_n,v_on_n):
     #find midpoint
     xstar_j = j - v_on_n[j,i]*pm.pm['dt']/float(2*pm.pm['d'])
     xstar_i = i - u_on_n[j,i]*pm.pm['dt']/float(2*pm.pm['d'])
+    #print xstar_j, xstar_i
     #find u at midpoint using previous time levels
     u_at_half_dt = 1.5*bi_inter_narr(xstar_j,xstar_i,u_on_n) - 0.5*bi_inter_narr(xstar_j,xstar_i,u_on_n_old)
     v_at_half_dt = 1.5*bi_inter_narr(xstar_j,xstar_i,v_on_n) - 0.5*bi_inter_narr(xstar_j,xstar_i,v_on_n_old)
     #find departure point (in index space)
     xd_j = j - v_at_half_dt*pm.pm['dt']/float(pm.pm['d'])
     xd_i = i - u_at_half_dt*pm.pm['dt']/float(pm.pm['d'])
+    #print xd_j, xd_i
     return xd_j, xd_i
 
 def find_four_corners(y_index,x_index,n=False,u=False,v=False):
@@ -123,38 +125,29 @@ def find_four_corners(y_index,x_index,n=False,u=False,v=False):
     i_max = int(math.ceil(id))
     j_min = int(math.floor(jd))
     j_max = int(math.ceil(jd))
-    return j_min, j_max, i_min, i_max
+    return j_min, j_max, i_min, i_max, jd, id
 
 def bi_inter_narr(y_index,x_index,array):
     i_min = int(math.floor(x_index))
     i_max = int(math.ceil(x_index))
     j_min = int(math.floor(y_index))
     j_max = int(math.ceil(y_index))
-    if j_min < 0:
-        a = bc.bcs()
-        b = bc.bcs()
-        c = array[j_max,i_min]
-        d = array[j_max,i_max]
-    elif i_min < 0:
-        a = bc.bcw()
-        b = array[j_min,i_max]
-        c = bc.bcw()
-        d = array[j_max,i_max]
-    elif j_max > pm.pm['nx']-2:
+    try:
         a = array[j_min,i_min]
+    except IndexError:
+        a = bc.bce()
+    try:
         b = array[j_min,i_max]
-        c = bc.bcn()
+    except IndexError:
+        b = bc.bcw()
+    try:
+        c = array[j_max,i_min]
+    except IndexError:
+        c = bc.bcs()
+    try:
+        d = array[j_max,i_max]
+    except IndexError:
         d = bc.bcn()
-    elif i_max > pm.pm['nx']-2:
-        a = array[j_min,i_min]
-        b = bc.bce()
-        c = array[j_max,i_min]
-        d = bc.bce()
-    else:
-        a = array[j_min,i_min]
-        b = array[j_min,i_max]
-        c = array[j_max,i_min]
-        d = array[j_max,i_max]
     #interpolate on y-direction
     y_alfa = (y_index - j_min)/1.
     y_beta = (j_max - y_index)/1.
@@ -170,31 +163,22 @@ def bi_inter_uarr(y_index,x_index,array):
     i_max = int(math.ceil(x_index))
     j_min = int(math.floor(y_index))
     j_max = int(math.ceil(y_index))
-    if j_min < 0:
-        a = bc.bcs()
-        b = bc.bcs()
-        c = array[j_max,i_min]
-        d = array[j_max,i_max]
-    elif i_min < 0:
-        a = bc.bcw()
-        b = array[j_min,i_max]
-        c = bc.bcw()
-        d = array[j_max,i_max]
-    elif j_max > pm.pm['nx']-2:
+    try:
         a = array[j_min,i_min]
+    except IndexError:
+        a = bc.bce()
+    try:
         b = array[j_min,i_max]
-        c = bc.bcn()
+    except IndexError:
+        b = bc.bcw()
+    try:
+        c = array[j_max,i_min]
+    except IndexError:
+        c = bc.bcs()
+    try:
+        d = array[j_max,i_max]
+    except IndexError:
         d = bc.bcn()
-    elif i_max > pm.pm['nx']-1:
-        a = array[j_min,i_min]
-        b = bc.bce()
-        c = array[j_max,i_min]
-        d = bc.bce()
-    else:
-        a = array[j_min,i_min]
-        b = array[j_min,i_max]
-        c = array[j_max,i_min]
-        d = array[j_max,i_max]
     #interpolate on y-direction
     y_alfa = (y_index - j_min)/1.
     y_beta = (j_max - y_index)/1.
@@ -272,13 +256,13 @@ def bi_inter_du_dx_on_narr(corners,array):
         c = du_dx_on_n(corners[1],corners[2],array)
         d = du_dx_on_n(corners[1],corners[3],array)
     #interpolate on y-direction
-    y_alfa = (y_index - j_min)/1.
-    y_beta = (j_max - y_index)/1.
+    y_alfa = (corners[4] - corners[0])/1.
+    y_beta = (corners[1] - corners[4])/1.
     lb = y_beta*a + y_alfa*c
     rb = y_beta*b + y_alfa*d
     #interpolate on x-direction
-    x_alfa = (x_index - i_min)/1.
-    x_beta = (i_max - x_index)/1.
+    x_alfa = (corners[5] - corners[2])/1.
+    x_beta = (corners[3] - corners[5])/1.
     return x_beta*lb + x_alfa*rb
 
 def bi_inter_dv_dy_on_narr(corners,array):
@@ -308,13 +292,13 @@ def bi_inter_dv_dy_on_narr(corners,array):
         c = dv_dy_on_n(corners[1],corners[2],array)
         d = dv_dy_on_n(corners[1],corners[3],array)
     #interpolate on y-direction
-    y_alfa = (y_index - j_min)/1.
-    y_beta = (j_max - y_index)/1.
+    y_alfa = (corners[4] - corners[0])/1.
+    y_beta = (corners[1] - corners[4])/1.
     lb = y_beta*a + y_alfa*c
     rb = y_beta*b + y_alfa*d
     #interpolate on x-direction
-    x_alfa = (x_index - i_min)/1.
-    x_beta = (i_max - x_index)/1.
+    x_alfa = (corners[5] - corners[2])/1.
+    x_beta = (corners[3] - corners[5])/1.
     return x_beta*lb + x_alfa*rb
 
 def bi_inter_v_on_uarr(corners,array):
@@ -344,13 +328,13 @@ def bi_inter_v_on_uarr(corners,array):
         c = v_on_u(corners[1],corners[2],array)
         d = v_on_u(corners[1],corners[3],array)
     #interpolate on y-direction
-    y_alfa = (y_index - j_min)/1.
-    y_beta = (j_max - y_index)/1.
+    y_alfa = (corners[4] - corners[0])/1.
+    y_beta = (corners[1] - corners[4])/1.
     lb = y_beta*a + y_alfa*c
     rb = y_beta*b + y_alfa*d
     #interpolate on x-direction
-    x_alfa = (x_index - i_min)/1.
-    x_beta = (i_max - x_index)/1.
+    x_alfa = (corners[5] - corners[2])/1.
+    x_beta = (corners[3] - corners[5])/1.
     return x_beta*lb + x_alfa*rb
 
 def bi_inter_u_on_varr(corners,array):
@@ -380,13 +364,13 @@ def bi_inter_u_on_varr(corners,array):
         c = u_on_v(corners[1],corners[2],array)
         d = u_on_v(corners[1],corners[3],array)
     #interpolate on y-direction
-    y_alfa = (y_index - j_min)/1.
-    y_beta = (j_max - y_index)/1.
+    y_alfa = (corners[4] - corners[0])/1.
+    y_beta = (corners[1] - corners[4])/1.
     lb = y_beta*a + y_alfa*c
     rb = y_beta*b + y_alfa*d
     #interpolate on x-direction
-    x_alfa = (x_index - i_min)/1.
-    x_beta = (i_max - x_index)/1.
+    x_alfa = (corners[5] - corners[2])/1.
+    x_beta = (corners[3] - corners[5])/1.
     return x_beta*lb + x_alfa*rb
 
 def bi_inter_dn_dx_on_uarr(corners,array):
@@ -416,13 +400,13 @@ def bi_inter_dn_dx_on_uarr(corners,array):
         c = dn_dx_on_u(corners[1],corners[2],array)
         d = dn_dx_on_u(corners[1],corners[3],array)
     #interpolate on y-direction
-    y_alfa = (y_index - j_min)/1.
-    y_beta = (j_max - y_index)/1.
+    y_alfa = (corners[4] - corners[0])/1.
+    y_beta = (corners[1] - corners[4])/1.
     lb = y_beta*a + y_alfa*c
     rb = y_beta*b + y_alfa*d
     #interpolate on x-direction
-    x_alfa = (x_index - i_min)/1.
-    x_beta = (i_max - x_index)/1.
+    x_alfa = (corners[5] - corners[2])/1.
+    x_beta = (corners[3] - corners[5])/1.
     return x_beta*lb + x_alfa*rb
 
 def bi_inter_dn_dy_on_varr(corners,array):
@@ -452,11 +436,11 @@ def bi_inter_dn_dy_on_varr(corners,array):
         c = dn_dy_on_v(corners[1],corners[2],array)
         d = dn_dy_on_v(corners[1],corners[3],array)
     #interpolate on y-direction
-    y_alfa = (y_index - j_min)/1.
-    y_beta = (j_max - y_index)/1.
+    y_alfa = (corners[4] - corners[0])/1.
+    y_beta = (corners[1] - corners[4])/1.
     lb = y_beta*a + y_alfa*c
     rb = y_beta*b + y_alfa*d
     #interpolate on x-direction
-    x_alfa = (x_index - i_min)/1.
-    x_beta = (i_max - x_index)/1.
+    x_alfa = (corners[5] - corners[2])/1.
+    x_beta = (corners[3] - corners[5])/1.
     return x_beta*lb + x_alfa*rb

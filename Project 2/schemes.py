@@ -1,7 +1,6 @@
 import parameters as pm
 import functions as f
 import math
-import copy
 
 
 def fbts_odd(n_on_n, u_on_u, v_on_v):
@@ -28,7 +27,7 @@ def fbts_odd(n_on_n, u_on_u, v_on_v):
 def fbts_even(n_on_n, u_on_u, v_on_v):
     for j in range(len(n_on_n)):
         for i in range(len(n_on_n[0])):
-            du_dx = f.du_dx_on_n(j, i, u_on_u)
+            du_dx = f.du_dx_on_n(j,i,u_on_u)
             dv_dy = f.dv_dy_on_n(j,i,v_on_v)
             n_on_n[j,i] = n_on_n[j,i] - pm.pm['H']*pm.pm['dt']*(du_dx + dv_dy)
     for j in range(1,len(v_on_v)-1):
@@ -119,7 +118,7 @@ def SL_fbts_odd(n_on_n_new, v_on_v_new, u_on_u_new, n_on_n, u_on_u, v_on_v, \
             dv_dy = f.dv_dy_on_n(j,i,v_on_v)
             du_dx_at_dp = f.bi_inter_du_dx_on_narr(corners_n,u_on_u_old)
             dv_dy_at_dp = f.bi_inter_dv_dy_on_narr(corners_n,v_on_v_old)
-            n_on_n_new[j,i] = f.bi_inter_narr(jd,id,n_on_n) - pm.pm['dt']*pm.pm['H'](du_dx + dv_dy   \
+            n_on_n_new[j,i] = f.bi_inter_narr(jd,id,n_on_n) - pm.pm['dt']*pm.pm['H']*(du_dx + dv_dy   \
                               + du_dx_at_dp + dv_dy_at_dp)/2.
     for j in range(len(u_on_u)):
         for i in range(1,len(u_on_u[0])-1):
@@ -155,19 +154,10 @@ def SL_fbts_odd(n_on_n_new, v_on_v_new, u_on_u_new, n_on_n, u_on_u, v_on_v, \
                    - pm.pm['gamma']*f.bi_inter_varr(jd+0.5,id,v_on_v_old) \
                    + pm.tau(pm.pm['tau0'], y_dp, pm.pm['L'])[1]/(float(pm.pm['roe']*pm.pm['H']))
             v_on_v_new[j,i] = f.bi_inter_varr(jd+0.5,id,v_on_v) + pm.pm['dt']*(S_ij + S_dp)/2.
-    u_on_n_old = copy.copy(u_on_n)
-    v_on_n_old = copy.copy(v_on_n)
-    u_on_u_old = copy.copy(u_on_u)
-    v_on_v_old = copy.copy(v_on_v)
-    n_on_n = copy.copy(n_on_n_new)
-    v_on_v = copy.copy(v_on_v_new)
-    u_on_u = copy.copy(u_on_u_new)
-    inter_u_on_n(n_on_n_new, u_on_u_new, u_on_n)
-    inter_v_on_n(n_on_n_new, v_on_v_new, v_on_n)
 
 
 def SL_fbts_even(n_on_n_new, v_on_v_new, u_on_u_new, n_on_n, u_on_u, v_on_v, \
-                u_on_u_old, v_on_v_old, u_on_n, v_on_n, v_on_n_old, u_on_n_old):
+                 u_on_u_old, v_on_v_old, u_on_n, v_on_n, v_on_n_old, u_on_n_old):
     for j in range(len(n_on_n)):
         for i in range(len(n_on_n[0])):
             #remember that 0,0 on n-grid is 0.5,0.5 on basin grid for departure point
@@ -181,7 +171,7 @@ def SL_fbts_even(n_on_n_new, v_on_v_new, u_on_u_new, n_on_n, u_on_u, v_on_v, \
             dv_dy = f.dv_dy_on_n(j,i,v_on_v)
             du_dx_at_dp = f.bi_inter_du_dx_on_narr(corners_n,u_on_u_old)
             dv_dy_at_dp = f.bi_inter_dv_dy_on_narr(corners_n,v_on_v_old)
-            n_on_n_new[j,i] = f.bi_inter_narr(jd,id,n_on_n) - pm.pm['dt']*pm.pm['H'](du_dx + dv_dy   \
+            n_on_n_new[j,i] = f.bi_inter_narr(jd,id,n_on_n) - pm.pm['dt']*pm.pm['H']*(du_dx + dv_dy   \
                               + du_dx_at_dp + dv_dy_at_dp)/2.
     for j in range(1,len(v_on_v)-1):
         for i in range(len(v_on_v[0])):
@@ -217,12 +207,3 @@ def SL_fbts_even(n_on_n_new, v_on_v_new, u_on_u_new, n_on_n, u_on_u, v_on_v, \
                    - pm.pm['gamma']*f.bi_inter_uarr(jd,id+0.5,u_on_u_old) \
                    + pm.tau(pm.pm['tau0'], y_dp, pm.pm['L'])[0]/(float(pm.pm['roe']*pm.pm['H']))
             u_on_u_new[j,i] = f.bi_inter_uarr(jd,id+0.5,u_on_u) + pm.pm['dt']*(S_ij + S_dp)/2.
-    u_on_n_old = copy.copy(u_on_n)
-    v_on_n_old = copy.copy(v_on_n)
-    u_on_u_old = copy.copy(u_on_u)
-    v_on_v_old = copy.copy(v_on_v)
-    n_on_n = copy.copy(n_on_n_new)
-    v_on_v = copy.copy(v_on_v_new)
-    u_on_u = copy.copy(u_on_u_new)
-    inter_u_on_n(n_on_n_new, u_on_u_new, u_on_n)
-    inter_v_on_n(n_on_n_new, v_on_v_new, v_on_n)
