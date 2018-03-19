@@ -27,7 +27,7 @@ def fbts_odd(n_on_n, u_on_u, v_on_v):
 def fbts_even(n_on_n, u_on_u, v_on_v):
     for j in range(len(n_on_n)):
         for i in range(len(n_on_n[0])):
-            du_dx = f.du_dx_on_n(j,i,u_on_u)
+            du_dx = f.du_dx_on_n(j, i, u_on_u)
             dv_dy = f.dv_dy_on_n(j,i,v_on_v)
             n_on_n[j,i] = n_on_n[j,i] - pm.pm['H']*pm.pm['dt']*(du_dx + dv_dy)
     for j in range(1,len(v_on_v)-1):
@@ -100,110 +100,3 @@ def analytic_solution(n_on_n, u_on_n, v_on_n, n0):
             e = pm.pm['beta']*pm.pm['L']/float(pm.pm['f0']*math.pi)*math.cos(math.pi*y/float(pm.pm['L']))
             g = f.f2(x/float(pm.pm['L']))*math.cos(math.pi*y/float(pm.pm['L']))
             n_on_n[j,i] = n0 + a*b*(c*g + f.f1(x/float(pm.pm['L']))*(d+e)/math.pi)
-
-#############################################
-
-def SL_fbts_odd(n_on_n_new, v_on_v_new, u_on_u_new, n_on_n, u_on_u, v_on_v, \
-                u_on_u_old, v_on_v_old, u_on_n, v_on_n, v_on_n_old, u_on_n_old):
-    for j in range(len(n_on_n)):
-        for i in range(len(n_on_n[0])):
-            #remember that 0,0 on n-grid is 0.5,0.5 on basin grid for departure point
-            #remember that 0,0 on u-grid is 0.5,0 on basin grid for departure point
-            #remember that 0,0 on v-grid is 0,0.5 on basin grid for departure point
-            jd, id = f.find_d_point_on_n(j,i,v_on_n_old,u_on_n_old,u_on_n,v_on_n)
-            jd_basin = jd + 0.5
-            id_basin = id + 0.5
-            corners_n = f.find_four_corners(jd_basin, id_basin, n = True)
-            du_dx = f.du_dx_on_n(j,i,u_on_u)
-            dv_dy = f.dv_dy_on_n(j,i,v_on_v)
-            du_dx_at_dp = f.bi_inter_du_dx_on_narr(corners_n,u_on_u_old)
-            dv_dy_at_dp = f.bi_inter_dv_dy_on_narr(corners_n,v_on_v_old)
-            n_on_n_new[j,i] = f.bi_inter_narr(jd,id,n_on_n) - pm.pm['dt']*pm.pm['H']*(du_dx + dv_dy   \
-                              + du_dx_at_dp + dv_dy_at_dp)/2.
-    for j in range(len(u_on_u)):
-        for i in range(1,len(u_on_u[0])-1):
-            jd, id = f.find_d_point_on_n(j,i,v_on_n_old,u_on_n_old,u_on_n,v_on_n)
-            jd_basin = jd + 0.5
-            id_basin = id + 0.5
-            corners_u = f.find_four_corners(jd_basin, id_basin, u = True)
-            y = (0.5+j)*pm.pm['d']
-            y_dp = jd_basin*pm.pm['d']
-            dn_dx_new = f.dn_dx_on_u(j,i,n_on_n_new)
-            S_ij = (pm.pm['f0'] + pm.pm['beta']*y)*f.v_on_u(j,i,v_on_v)  \
-                   - pm.pm['g']*dn_dx_new - pm.pm['gamma']*u_on_u[j,i]       \
-                   + pm.tau(pm.pm['tau0'], y, pm.pm['L'])[0]/(float(pm.pm['roe']*pm.pm['H']))
-            S_dp = (pm.pm['f0'] + pm.pm['beta']*y_dp)*f.bi_inter_v_on_uarr(corners_u,v_on_v_old) \
-                   - pm.pm['g']*f.bi_inter_dn_dx_on_uarr(corners_u,n_on_n) \
-                   - pm.pm['gamma']*f.bi_inter_uarr(jd,id+0.5,u_on_u_old) \
-                   + pm.tau(pm.pm['tau0'], y_dp, pm.pm['L'])[0]/(float(pm.pm['roe']*pm.pm['H']))
-            u_on_u_new[j,i] = f.bi_inter_uarr(jd,id+0.5,u_on_u) + pm.pm['dt']*(S_ij + S_dp)/2.
-    for j in range(1,len(v_on_v)-1):
-        for i in range(len(v_on_v[0])):
-            jd, id = f.find_d_point_on_n(j,i,v_on_n_old,u_on_n_old,u_on_n,v_on_n)
-            jd_basin = jd + 0.5
-            id_basin = id + 0.5
-            corners_v = f.find_four_corners(jd_basin, id_basin, v = True)
-            y = j*pm.pm['d']
-            y_dp = jd_basin*pm.pm['d']
-            dn_dy_new = f.dn_dy_on_v(j,i,n_on_n_new)
-            S_ij = -(pm.pm['f0'] + pm.pm['beta']*y)*f.u_on_v(j,i,u_on_u_new)  \
-                   - pm.pm['g']*dn_dy_new - pm.pm['gamma']*v_on_v[j,i]       \
-                   + pm.tau(pm.pm['tau0'], y, pm.pm['L'])[1]/(float(pm.pm['roe']*pm.pm['H']))
-            S_dp = -(pm.pm['f0'] + pm.pm['beta']*y_dp)*f.bi_inter_u_on_varr(corners_v,u_on_u) \
-                   - pm.pm['g']*f.bi_inter_dn_dy_on_varr(corners_v,n_on_n) \
-                   - pm.pm['gamma']*f.bi_inter_varr(jd+0.5,id,v_on_v_old) \
-                   + pm.tau(pm.pm['tau0'], y_dp, pm.pm['L'])[1]/(float(pm.pm['roe']*pm.pm['H']))
-            v_on_v_new[j,i] = f.bi_inter_varr(jd+0.5,id,v_on_v) + pm.pm['dt']*(S_ij + S_dp)/2.
-
-
-def SL_fbts_even(n_on_n_new, v_on_v_new, u_on_u_new, n_on_n, u_on_u, v_on_v, \
-                 u_on_u_old, v_on_v_old, u_on_n, v_on_n, v_on_n_old, u_on_n_old):
-    for j in range(len(n_on_n)):
-        for i in range(len(n_on_n[0])):
-            #remember that 0,0 on n-grid is 0.5,0.5 on basin grid for departure point
-            #remember that 0,0 on u-grid is 0.5,0 on basin grid for departure point
-            #remember that 0,0 on v-grid is 0,0.5 on basin grid for departure point
-            jd, id = f.find_d_point_on_n(j,i,v_on_n_old,u_on_n_old,u_on_n,v_on_n)
-            jd_basin = jd + 0.5
-            id_basin = id + 0.5
-            corners_n = f.find_four_corners(jd_basin, id_basin, n = True)
-            du_dx = f.du_dx_on_n(j,i,u_on_u)
-            dv_dy = f.dv_dy_on_n(j,i,v_on_v)
-            du_dx_at_dp = f.bi_inter_du_dx_on_narr(corners_n,u_on_u_old)
-            dv_dy_at_dp = f.bi_inter_dv_dy_on_narr(corners_n,v_on_v_old)
-            n_on_n_new[j,i] = f.bi_inter_narr(jd,id,n_on_n) - pm.pm['dt']*pm.pm['H']*(du_dx + dv_dy   \
-                              + du_dx_at_dp + dv_dy_at_dp)/2.
-    for j in range(1,len(v_on_v)-1):
-        for i in range(len(v_on_v[0])):
-            jd, id = f.find_d_point_on_n(j,i,v_on_n_old,u_on_n_old,u_on_n,v_on_n)
-            jd_basin = jd + 0.5
-            id_basin = id + 0.5
-            corners_v = f.find_four_corners(jd_basin, id_basin, v = True)
-            y = j*pm.pm['d']
-            y_dp = jd_basin*pm.pm['d']
-            dn_dy_new = f.dn_dy_on_v(j,i,n_on_n_new)
-            S_ij = -(pm.pm['f0'] + pm.pm['beta']*y)*f.u_on_v(j,i,u_on_u)  \
-                   - pm.pm['g']*dn_dy_new - pm.pm['gamma']*v_on_v[j,i]       \
-                   + pm.tau(pm.pm['tau0'], y, pm.pm['L'])[1]/(float(pm.pm['roe']*pm.pm['H']))
-            S_dp = -(pm.pm['f0'] + pm.pm['beta']*y_dp)*f.bi_inter_u_on_varr(corners_v,u_on_u_old) \
-                   - pm.pm['g']*f.bi_inter_dn_dy_on_varr(corners_v,n_on_n) \
-                   - pm.pm['gamma']*f.bi_inter_varr(jd+0.5,id,v_on_v_old) \
-                   + pm.tau(pm.pm['tau0'], y_dp, pm.pm['L'])[1]/(float(pm.pm['roe']*pm.pm['H']))
-            v_on_v_new[j,i] = f.bi_inter_varr(jd+0.5,id,v_on_v) + pm.pm['dt']*(S_ij + S_dp)/2.
-    for j in range(len(u_on_u)):
-        for i in range(1,len(u_on_u[0])-1):
-            jd, id = f.find_d_point_on_n(j,i,v_on_n_old,u_on_n_old,u_on_n,v_on_n)
-            jd_basin = jd + 0.5
-            id_basin = id + 0.5
-            corners_u = f.find_four_corners(jd_basin, id_basin, u = True)
-            y = (0.5+j)*pm.pm['d']
-            y_dp = jd_basin*pm.pm['d']
-            dn_dx_new = f.dn_dx_on_u(j,i,n_on_n_new)
-            S_ij = (pm.pm['f0'] + pm.pm['beta']*y)*f.v_on_u(j,i,v_on_v_new)  \
-                   - pm.pm['g']*dn_dx_new - pm.pm['gamma']*u_on_u[j,i]       \
-                   + pm.tau(pm.pm['tau0'], y, pm.pm['L'])[0]/(float(pm.pm['roe']*pm.pm['H']))
-            S_dp = (pm.pm['f0'] + pm.pm['beta']*y_dp)*f.bi_inter_v_on_uarr(corners_u,v_on_v) \
-                   - pm.pm['g']*f.bi_inter_dn_dx_on_uarr(corners_u,n_on_n) \
-                   - pm.pm['gamma']*f.bi_inter_uarr(jd,id+0.5,u_on_u_old) \
-                   + pm.tau(pm.pm['tau0'], y_dp, pm.pm['L'])[0]/(float(pm.pm['roe']*pm.pm['H']))
-            u_on_u_new[j,i] = f.bi_inter_uarr(jd,id+0.5,u_on_u) + pm.pm['dt']*(S_ij + S_dp)/2.
