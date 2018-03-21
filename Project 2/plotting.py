@@ -66,6 +66,28 @@ def plot_TaskD(n_on_n_ana, n_diff_on_n):
     plt.contourf(n_diff_on_n)
     plt.colorbar(label="Difference in $\eta$ (m)")
     plt.tight_layout()
+    plt.show()
+
+def plot_TaskD3(n_on_n_ana, n_on_n):
+    plt.subplot(1,2,1)
+    plt.title("a")
+    plt.xlabel("Spatial distance ($m$)")
+    plt.xticks([0, 5, 10, 15, 20, 25],[0,200000,400000,600000,800000,1000000], rotation=90)
+    plt.ylabel("Spatial distance ($m$)")
+    plt.yticks([0, 5, 10, 15, 20, 25],[0,200000,400000,600000,800000,1000000])
+    plt.contourf(n_on_n_ana)
+    plt.colorbar(label="$\eta$ (m)")
+    plt.tight_layout()
+
+    plt.subplot(1,2,2)
+    plt.title("b")
+    plt.xlabel("Spatial distance ($m$)")
+    plt.xticks([0, 5, 10, 15, 20, 25],[0,200000,400000,600000,800000,1000000], rotation=90)
+    plt.ylabel("Spatial distance ($m$)")
+    plt.yticks([0, 5, 10, 15, 20, 25],[0,200000,400000,600000,800000,1000000])
+    plt.contourf(n_on_n)
+    plt.colorbar(label="Difference in $\eta$ (m)")
+    plt.tight_layout()
 
 def plot_TaskD2(r1, r2, r3, error1, error2, error3):
     plt.xlabel("Horizontal resolution (m)")

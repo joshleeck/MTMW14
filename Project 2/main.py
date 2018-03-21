@@ -4,11 +4,12 @@ import functions as f
 import schemes as sch
 import bc_ic as bc
 import plotting as pt
+import copy
 
 
 #if task a = true do this, if task b = true do this etc. main(TaskA=True,TaskB=True...)
 #initialise arrays with initial conditions
-def main(TaskB = False, TaskC1 = False, TaskC2 = False, TaskD = False, TaskD1 = False, TaskD2 = False):
+def main(TaskB = False, TaskC1 = False, TaskC2 = False, TaskD = False, TaskD1 = False, TaskD2 = False, TaskD3 = False):
     u_on_u, v_on_v, n_on_n, u_on_n, v_on_n, v_on_u, u_on_v = bc.ic()
 
     E_num = []
@@ -68,6 +69,8 @@ def main(TaskB = False, TaskC1 = False, TaskC2 = False, TaskD = False, TaskD1 = 
         pt.plot_TaskD(n_on_n_ana, n_diff_on_n)
     if TaskD2 == True:
         pt.plot_TaskD2(40000,25000,20000,3.22*1e13,2.33*1e13,2.12*1e13)
+    if TaskD3 == True:
+        pt.plot_TaskD3(n_on_n_ana, n_on_n)
 
 ####################################################
 
@@ -78,11 +81,9 @@ def main2(TaskE1 = False, TaskE2 = False):
     for timestep in range(pm.pm['nt']):
         if timestep % 2 != 0:
             sch.SL_fbts_odd(n_on_n_new, v_on_v_new, u_on_u_new, n_on_n, u_on_u, v_on_v, \
-                            u_on_u_old, v_on_v_old, u_on_n, v_on_n, v_on_n_old, u_on_n_old)
+                            u_on_n, v_on_n, v_on_n_old, u_on_n_old)
             u_on_n_old = copy.copy(u_on_n)
             v_on_n_old = copy.copy(v_on_n)
-            u_on_u_old = copy.copy(u_on_u)
-            v_on_v_old = copy.copy(v_on_v)
             n_on_n = copy.copy(n_on_n_new)
             v_on_v = copy.copy(v_on_v_new)
             u_on_u = copy.copy(u_on_u_new)
@@ -90,11 +91,9 @@ def main2(TaskE1 = False, TaskE2 = False):
             sch.inter_v_on_n(n_on_n_new, v_on_v_new, v_on_n)
         elif timestep % 2 == 0:
             sch.SL_fbts_even(n_on_n_new, v_on_v_new, u_on_u_new, n_on_n, u_on_u, v_on_v, \
-                             u_on_u_old, v_on_v_old, u_on_n, v_on_n, v_on_n_old, u_on_n_old)
+                             u_on_n, v_on_n, v_on_n_old, u_on_n_old)
             u_on_n_old = copy.copy(u_on_n)
             v_on_n_old = copy.copy(v_on_n)
-            u_on_u_old = copy.copy(u_on_u)
-            v_on_v_old = copy.copy(v_on_v)
             n_on_n = copy.copy(n_on_n_new)
             v_on_v = copy.copy(v_on_v_new)
             u_on_u = copy.copy(u_on_u_new)
@@ -125,4 +124,5 @@ def main2(TaskE1 = False, TaskE2 = False):
         pt.plot_TaskE2(n_on_n, n_on_n_ana)
 
 
-#main(TaskD1 = True, TaskD = True)
+#main(TaskD1 = True, TaskD = True) #make sure linear model is okay with 150, 576, 2.46592430464e+15 J
+#main2(TaskE1 = True, TaskE2 = True)
