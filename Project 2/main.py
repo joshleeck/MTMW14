@@ -140,7 +140,3 @@ def main2(TaskE1 = False, TaskE2 = False):
 
     if TaskE2 == True:
         pt.plot_TaskE2(n_on_n, n_on_n_ana)
-
-
-main(TaskB = True, TaskD1 = True) #make sure linear model is okay with 150, 576, 2.46592430464e+15 J
-main2(TaskE1 = True, TaskE2 = True)

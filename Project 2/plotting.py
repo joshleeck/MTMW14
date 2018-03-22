@@ -51,7 +51,6 @@ def plot_TaskB(u_on_vsouth, v_on_uwest, n_on_nmiddle, n_on_n):
     plt.subplot(1,2,2)
     plt.title("(b)")
     contour_plot(n_on_n)
-    plt.show()
 
 def plot_TaskC(E_num, tick_space, days = False, hours = False):
     """
@@ -120,7 +119,6 @@ def plot_TaskE1(u_on_vsouth, v_on_uwest, n_on_nmiddle, n_on_n):
     plt.subplot(1,2,2)
     plt.title("(b)")
     contour_plot(n_on_n)
-    plt.show()
 
 def plot_TaskE2(n_on_n, n_on_n_ana):
     """
