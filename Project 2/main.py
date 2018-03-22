@@ -75,8 +75,6 @@ def main(TaskB = False, TaskC1 = False, TaskC2 = False, TaskD = False, TaskD1 = 
     if TaskD3 == True:
         pt.plot_TaskD3(n_on_n_ana, n_on_n)
 
-####################################################
-
 def main2(TaskE1 = False, TaskE2 = False):
     """
     This function runs the non-linear SWE model used for Tasks E and F.

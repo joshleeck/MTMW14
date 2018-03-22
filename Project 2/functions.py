@@ -150,6 +150,7 @@ def find_four_corners(y_index,x_index,n=False,u=False,v=False):
     with respect to the ocean basin.
     This is used for interpolation.
     """
+    #fix basin grid index to corresponding u, v or n grid index
     if n == True:
         jd = y_index - 0.5
         id = x_index - 0.5

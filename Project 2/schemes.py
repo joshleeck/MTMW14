@@ -156,6 +156,7 @@ def SL_fbts_odd(n_on_n_new, v_on_v_new, u_on_u_new, n_on_n, u_on_u, v_on_v,
             jd, id = f.find_d_point_on_n(j,i,v_on_n_old,u_on_n_old,u_on_n,v_on_n)
             jd_basin = jd + 0.5
             id_basin = id + 0.5
+            #find the 4 grid corners of the departure point on the n grid
             corners_n = f.find_four_corners(jd_basin, id_basin, n = True)
             du_dx = f.du_dx_on_n(j,i,u_on_u)
             dv_dy = f.dv_dy_on_n(j,i,v_on_v)
@@ -169,13 +170,16 @@ def SL_fbts_odd(n_on_n_new, v_on_v_new, u_on_u_new, n_on_n, u_on_u, v_on_v,
             jd, id = f.find_d_point_on_n(j,i,v_on_n_old,u_on_n_old,u_on_n,v_on_n)
             jd_basin = jd + 0.5
             id_basin = id + 0.5
+            #find the 4 grid corners of the departure point on the u grid
             corners_u = f.find_four_corners(jd_basin, id_basin, u = True)
             y = (0.5+j)*pm.pm['d']
             y_dp = jd_basin*pm.pm['d']
             dn_dx_new = f.dn_dx_on_u(j,i,n_on_n_new)
+            #source terms at x_ij
             S_ij = (pm.pm['f0'] + pm.pm['beta']*y)*f.v_on_u(j,i,v_on_v)  \
                    - pm.pm['g']*dn_dx_new      \
                    + pm.tau(pm.pm['tau0'], y, pm.pm['L'])[0]/(float(pm.pm['roe']*pm.pm['H']))
+            #source terms at departure point
             S_dp = (pm.pm['f0'] + pm.pm['beta']*y_dp)*f.bi_inter_v_on_uarr(corners_u,v_on_v,f.v_on_u) \
                    - pm.pm['g']*f.bi_inter_dn_dx_on_uarr(corners_u,n_on_n,f.dn_dx_on_u) \
                    - pm.pm['gamma']*f.bi_inter_arr(jd,id+0.5,u_on_u,var='u') \
@@ -188,13 +192,16 @@ def SL_fbts_odd(n_on_n_new, v_on_v_new, u_on_u_new, n_on_n, u_on_u, v_on_v,
             jd, id = f.find_d_point_on_n(j,i,v_on_n_old,u_on_n_old,u_on_n,v_on_n)
             jd_basin = jd + 0.5
             id_basin = id + 0.5
+            #find the 4 grid corners of the departure point on the v grid
             corners_v = f.find_four_corners(jd_basin, id_basin, v = True)
             y = j*pm.pm['d']
             y_dp = jd_basin*pm.pm['d']
             dn_dy_new = f.dn_dy_on_v(j,i,n_on_n_new)
+            #source terms at x_ij
             S_ij = -(pm.pm['f0'] + pm.pm['beta']*y)*f.u_on_v(j,i,u_on_u_new)  \
                    - pm.pm['g']*dn_dy_new      \
                    + pm.tau(pm.pm['tau0'], y, pm.pm['L'])[1]/(float(pm.pm['roe']*pm.pm['H']))
+            #source terms at departure point
             S_dp = -(pm.pm['f0'] + pm.pm['beta']*y_dp)*f.bi_inter_u_on_varr(corners_v,u_on_u,f.u_on_v) \
                    - pm.pm['g']*f.bi_inter_dn_dy_on_varr(corners_v,n_on_n,f.dn_dy_on_v) \
                    - pm.pm['gamma']*f.bi_inter_arr(jd+0.5,id,v_on_v,var='v') \
@@ -214,6 +221,7 @@ def SL_fbts_even(n_on_n_new, v_on_v_new, u_on_u_new, n_on_n, u_on_u, v_on_v,
             jd, id = f.find_d_point_on_n(j,i,v_on_n_old,u_on_n_old,u_on_n,v_on_n)
             jd_basin = jd + 0.5
             id_basin = id + 0.5
+            #find the 4 grid corners of the departure point on the n grid
             corners_n = f.find_four_corners(jd_basin, id_basin, n = True)
             du_dx = f.du_dx_on_n(j,i,u_on_u)
             dv_dy = f.dv_dy_on_n(j,i,v_on_v)
@@ -227,13 +235,16 @@ def SL_fbts_even(n_on_n_new, v_on_v_new, u_on_u_new, n_on_n, u_on_u, v_on_v,
             jd, id = f.find_d_point_on_n(j,i,v_on_n_old,u_on_n_old,u_on_n,v_on_n)
             jd_basin = jd + 0.5
             id_basin = id + 0.5
+            #find the 4 grid corners of the departure point on the v grid
             corners_v = f.find_four_corners(jd_basin, id_basin, v = True)
             y = j*pm.pm['d']
             y_dp = jd_basin*pm.pm['d']
             dn_dy_new = f.dn_dy_on_v(j,i,n_on_n_new)
+            #source terms at x_ij
             S_ij = -(pm.pm['f0'] + pm.pm['beta']*y)*f.u_on_v(j,i,u_on_u)  \
                    - pm.pm['g']*dn_dy_new      \
                    + pm.tau(pm.pm['tau0'], y, pm.pm['L'])[1]/(float(pm.pm['roe']*pm.pm['H']))
+            #source terms at departure point
             S_dp = -(pm.pm['f0'] + pm.pm['beta']*y_dp)*f.bi_inter_u_on_varr(corners_v,u_on_u,f.u_on_v) \
                    - pm.pm['g']*f.bi_inter_dn_dy_on_varr(corners_v,n_on_n,f.dn_dy_on_v) \
                    - pm.pm['gamma']*f.bi_inter_arr(jd+0.5,id,v_on_v,var='v') \
@@ -246,13 +257,16 @@ def SL_fbts_even(n_on_n_new, v_on_v_new, u_on_u_new, n_on_n, u_on_u, v_on_v,
             jd, id = f.find_d_point_on_n(j,i,v_on_n_old,u_on_n_old,u_on_n,v_on_n)
             jd_basin = jd + 0.5
             id_basin = id + 0.5
+            #find the 4 grid corners of the departure point on the u grid
             corners_u = f.find_four_corners(jd_basin, id_basin, u = True)
             y = (0.5+j)*pm.pm['d']
             y_dp = jd_basin*pm.pm['d']
             dn_dx_new = f.dn_dx_on_u(j,i,n_on_n_new)
+            #source terms at x_ij
             S_ij = (pm.pm['f0'] + pm.pm['beta']*y)*f.v_on_u(j,i,v_on_v_new)  \
                    - pm.pm['g']*dn_dx_new      \
                    + pm.tau(pm.pm['tau0'], y, pm.pm['L'])[0]/(float(pm.pm['roe']*pm.pm['H']))
+            #source terms at departure point
             S_dp = (pm.pm['f0'] + pm.pm['beta']*y_dp)*f.bi_inter_v_on_uarr(corners_u,v_on_v,f.v_on_u) \
                    - pm.pm['g']*f.bi_inter_dn_dx_on_uarr(corners_u,n_on_n,f.dn_dx_on_u) \
                    - pm.pm['gamma']*f.bi_inter_arr(jd,id+0.5,u_on_u,var='u') \

@@ -1,5 +1,5 @@
 """
-This script describes all the plotting schemes for the various Tasks.
+This script describes all the plotting schemes for the various tasks.
 """
 import matplotlib.pyplot as plt
 import parameters as pm
