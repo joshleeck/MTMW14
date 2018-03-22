@@ -1,18 +1,24 @@
+"""
+This script contains the function to run the SWE model and plot the figures for the various tasks.
+"""
 import numpy as np
 import parameters as pm
-import functions as f
 import schemes as sch
 import bc_ic as bc
 import plotting as pt
 import copy
 
 
-#if task a = true do this, if task b = true do this etc. main(TaskA=True,TaskB=True...)
-#initialise arrays with initial conditions
 def main(TaskB = False, TaskC1 = False, TaskC2 = False, TaskD = False, TaskD1 = False, TaskD2 = False, TaskD3 = False):
+    """
+    This function runs the linear SWE model used for Tasks B to D.
+    """
+    #initialise arrays with initial conditions
     u_on_u, v_on_v, n_on_n, u_on_n, v_on_n, v_on_u, u_on_v = bc.ic()
 
+    #array for storing E values
     E_num = []
+    #model run
     for timestep in range(pm.pm['nt']):
         if timestep % 2 != 0:
             sch.fbts_odd(n_on_n, u_on_u, v_on_v)
@@ -24,9 +30,11 @@ def main(TaskB = False, TaskC1 = False, TaskC2 = False, TaskD = False, TaskD1 = 
         sch.inter_v_on_n(n_on_n, v_on_v, v_on_n)
         #calculate energy on n grid
         E_num.append(sch.calc_E(n_on_n, u_on_n, v_on_n))
+        #track model run
         #if timestep%100 == 0:
         #    print timestep
 
+    #interpolate for v on u grid and u on v grid to plot for Task B
     v_on_u = sch.inter_v_on_u(u_on_u, v_on_v, v_on_u)
     u_on_v = sch.inter_u_on_v(u_on_u, v_on_v, u_on_v)
 
@@ -47,17 +55,12 @@ def main(TaskB = False, TaskC1 = False, TaskC2 = False, TaskD = False, TaskD1 = 
         pt.plot_TaskC(E_num, 24, hours=True)
     if TaskC2 == True:
         pt.plot_TaskC(E_num, 576, days=True)
-    # print u_on_u
-    # print n_on_n
-    # print v_on_v
-    # print E_num
 
+    #initialise arrays with initial conditions
     n_on_n_ana, u_on_n_ana, v_on_n_ana = bc.ic()[2:5]
+    #calculate analytic solution
     sch.analytic_solution(n_on_n_ana, u_on_n_ana, v_on_n_ana, n_on_n[(pm.pm['nx']-1)/2,0])
-    #print u_on_n_ana
-    #print v_on_n_ana
-    #print n_on_n_ana
-
+    #calculate difference fields
     u_diff_on_n = np.subtract(u_on_n, u_on_n_ana)
     v_diff_on_n = np.subtract(v_on_n, v_on_n_ana)
     n_diff_on_n = np.subtract(n_on_n, n_on_n_ana)
@@ -75,32 +78,45 @@ def main(TaskB = False, TaskC1 = False, TaskC2 = False, TaskD = False, TaskD1 = 
 ####################################################
 
 def main2(TaskE1 = False, TaskE2 = False):
+    """
+    This function runs the non-linear SWE model used for Tasks E and F.
+    """
+    #initialise arrays with initial conditions
     u_on_u, v_on_v, n_on_n, u_on_n, v_on_n, v_on_u, u_on_v = bc.ic()
     u_on_u_old, v_on_v_old, n_on_n_old, u_on_n_old, v_on_n_old, v_on_u_old, u_on_v_old = bc.ic()
     u_on_u_new, v_on_v_new, n_on_n_new, u_on_n_new, v_on_n_new, v_on_u_new, u_on_v_new = bc.ic()
+    #model run
     for timestep in range(pm.pm['nt']):
         if timestep % 2 != 0:
             sch.SL_fbts_odd(n_on_n_new, v_on_v_new, u_on_u_new, n_on_n, u_on_u, v_on_v, \
                             u_on_n, v_on_n, v_on_n_old, u_on_n_old)
+            #arrays are replaced with time
             u_on_n_old = copy.copy(u_on_n)
             v_on_n_old = copy.copy(v_on_n)
             n_on_n = copy.copy(n_on_n_new)
             v_on_v = copy.copy(v_on_v_new)
             u_on_u = copy.copy(u_on_u_new)
-            sch.inter_u_on_n(n_on_n_new, u_on_u_new, u_on_n)
-            sch.inter_v_on_n(n_on_n_new, v_on_v_new, v_on_n)
+            sch.inter_u_on_n(n_on_n_new, u_on_u_new, u_on_n_new)
+            sch.inter_v_on_n(n_on_n_new, v_on_v_new, v_on_n_new)
+            u_on_n = copy.copy(u_on_n_new)
+            v_on_n = copy.copy(v_on_n_new)
         elif timestep % 2 == 0:
             sch.SL_fbts_even(n_on_n_new, v_on_v_new, u_on_u_new, n_on_n, u_on_u, v_on_v, \
                              u_on_n, v_on_n, v_on_n_old, u_on_n_old)
+            #arrays are replaced with time
             u_on_n_old = copy.copy(u_on_n)
             v_on_n_old = copy.copy(v_on_n)
             n_on_n = copy.copy(n_on_n_new)
             v_on_v = copy.copy(v_on_v_new)
             u_on_u = copy.copy(u_on_u_new)
-            sch.inter_u_on_n(n_on_n_new, u_on_u_new, u_on_n)
-            sch.inter_v_on_n(n_on_n_new, v_on_v_new, v_on_n)
-        print timestep
+            sch.inter_u_on_n(n_on_n_new, u_on_u_new, u_on_n_new)
+            sch.inter_v_on_n(n_on_n_new, v_on_v_new, v_on_n_new)
+            u_on_n = copy.copy(u_on_n_new)
+            v_on_n = copy.copy(v_on_n_new)
+        #track model run
+        #print timestep
 
+    #interpolate for v on u grid and u on v grid to plot for Task E
     v_on_u = sch.inter_v_on_u(u_on_u, v_on_v, v_on_u)
     u_on_v = sch.inter_u_on_v(u_on_u, v_on_v, u_on_v)
 
@@ -117,12 +133,14 @@ def main2(TaskE1 = False, TaskE2 = False):
 
         pt.plot_TaskE1(u_on_vsouth, v_on_uwest, n_on_nmiddle, n_on_n)
 
+    #initialise arrays with initial conditions
     n_on_n_ana, u_on_n_ana, v_on_n_ana = bc.ic()[2:5]
-    sch.analytic_solution(n_on_n_ana, u_on_n_ana, v_on_n_ana, n_on_n[(pm.pm['nx']-1)/2,0])
+    #calculate analytic solution based on n0 from linear model
+    sch.analytic_solution(n_on_n_ana, u_on_n_ana, v_on_n_ana, -0.0641733736596)
 
     if TaskE2 == True:
         pt.plot_TaskE2(n_on_n, n_on_n_ana)
 
 
-#main(TaskD1 = True, TaskD = True) #make sure linear model is okay with 150, 576, 2.46592430464e+15 J
-#main2(TaskE1 = True, TaskE2 = True)
+main(TaskB = True, TaskD1 = True) #make sure linear model is okay with 150, 576, 2.46592430464e+15 J
+main2(TaskE1 = True, TaskE2 = True)
