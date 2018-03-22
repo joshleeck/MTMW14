@@ -6,9 +6,15 @@ import numpy as np
 
 #functions for parameters
 def calc_Rd(g, H, f0):
+    """
+    This function calculates the Rossby deformation radius
+    """
     return math.sqrt(g*H)/float(f0)
 
 def tau(tau0, y, L):
+    """
+    This function calculates the wind forcing tau as a function of y.
+    """
     if y < 0:
         y = 0
     if y > L:
